@@ -6,21 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('author');
+            $table->text('description');
+            $table->string('file_path');  // Chemin vers PDF/ePub
+            $table->string('niveau_etude')->nullable();  // Niveau pour recherche
+            $table->string('module')->nullable();  // Module pour recherche
+            $table->text('tutoriel')->nullable();  // Tutoriel associé
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('books');
     }
