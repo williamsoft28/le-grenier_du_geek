@@ -1,28 +1,80 @@
 @extends('layouts.app')
 
 @section('content')
-<h1>Soumettre un Document</h1>
+<h1 class="text-2xl font-bold mb-4">Soumettre un Document</h1>
+<p class="mb-4 text-gray-600">Vos infos sont pré-remplies (non modifiables).</p>
+
 <form method="POST" action="{{ route('books.store') }}" enctype="multipart/form-data">
     @csrf
-    <!-- Champs user pré-remplis et verrouillés -->
-    <div>
-        <label>Prénom</label>
-        <input type="text" value="{{ auth()->user()->first_name }}" disabled class="border p-2 w-full bg-gray-200">
+
+    <!-- Champs User Verrouillés -->
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium mb-1">Prénom</label>
+            <input type="text" value="{{ auth()->user()->first_name }}" disabled class="block w-full border p-2 rounded bg-gray-100">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Nom</label>
+            <input type="text" value="{{ auth()->user()->last_name }}" disabled class="block w-full border p-2 rounded bg-gray-100">
+        </div>
     </div>
-    <div>
-        <label>Nom</label>
-        <input type="text" value="{{ auth()->user()->last_name }}" disabled class="border p-2 w-full bg-gray-200">
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium mb-1">Email</label>
+            <input type="email" value="{{ auth()->user()->email }}" disabled class="block w-full border p-2 rounded bg-gray-100">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Filière</label>
+            <input type="text" value="{{ auth()->user()->filiere }}" class="block w-full border p-2 rounded" name="filiere">
+        </div>
     </div>
-    <div>
-        <label>Email</label>
-        <input type="email" value="{{ auth()->user()->email }}" disabled class="border p-2 w-full bg-gray-200">
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium mb-1">Université</label>
+            <input type="text" value="{{ auth()->user()->universite }}" class="block w-full border p-2 rounded" name="universite">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Niveau d'Étude <span class="text-red-500">*</span></label>
+            <input type="text" name="niveau_etude" required class="block w-full border p-2 rounded" value="{{ old('niveau_etude') }}" placeholder="Ex: Licence 3">
+            <x-input-error :messages="$errors->get('niveau_etude')" class="mt-1" />
+        </div>
     </div>
-    <!-- Autres champs comme ci-dessus : title, etc. -->
-    <div>
-        <label>Niveau d'étude</label>
-        <input type="text" name="niveau_etude" class="border p-2 w-full" value="{{ auth()->user()->niveau_etude }}">
+
+    <!-- Champs Document (même que guest, sans user) -->
+    <h2 class="text-lg font-semibold mb-2">Infos du Document</h2>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Titre <span class="text-red-500">*</span></label>
+        <input type="text" name="title" required class="block w-full border p-2 rounded" value="{{ old('title') }}">
+        <x-input-error :messages="$errors->get('title')" class="mt-1" />
     </div>
-    <!-- ... (ajoute author, file, module, tutoriel comme dans create-guest) -->
-    <button type="submit">Soumettre</button>
+    <!-- ... Ajoute author, description, module, tutoriel, file comme dans create-guest ... -->
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Auteur <span class="text-red-500">*</span></label>
+        <input type="text" name="author" required class="block w-full border p-2 rounded" value="{{ old('author') }}">
+        <x-input-error :messages="$errors->get('author')" class="mt-1" />
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Description <span class="text-red-500">*</span></label>
+        <textarea name="description" required class="block w-full border p-2 rounded" rows="3">{{ old('description') }}</textarea>
+        <x-input-error :messages="$errors->get('description')" class="mt-1" />
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Module (pour recherche)</label>
+        <input type="text" name="module" class="block w-full border p-2 rounded" value="{{ old('module') }}">
+        <x-input-error :messages="$errors->get('module')" class="mt-1" />
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Tutoriel (texte optionnel)</label>
+        <textarea name="tutoriel" class="block w-full border p-2 rounded" rows="3">{{ old('tutoriel') }}</textarea>
+        <x-input-error :messages="$errors->get('tutoriel')" class="mt-1" />
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Fichier (PDF/ePub) <span class="text-red-500">*</span></label>
+        <input type="file" name="file" required class="block w-full border p-2 rounded" accept=".pdf,.epub">
+        <x-input-error :messages="$errors->get('file')" class="mt-1" />
+    </div>
+
+    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Soumettre</button>
 </form>
+
 @endsection

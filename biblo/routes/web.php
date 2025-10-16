@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/books');
 });
 
 Route::get('/dashboard', function () {
@@ -17,4 +18,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Routes Livres (create AVANT show pour éviter matching {book} = 'create')
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
+Route::post('/books', [BookController::class, 'store'])->name('books.store');
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+
+// Auth Breeze
 require __DIR__.'/auth.php';

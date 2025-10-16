@@ -17,13 +17,13 @@ class Book extends Model
     }
 
     // Recherche étendue (titre, auteur, niveau, module)
-    public function scopeSearch($query, $search)
-    {
-        return $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-              ->orWhere('author', 'like', "%{$search}%")
-              ->orWhere('niveau_etude', 'like', "%{$search}%")
-              ->orWhere('module', 'like', "%{$search}%");
-        });
-    }
+   public function scopeSearch($query, $search)
+{
+    return $query->where(function ($q) use ($search) {
+        $q->where('title', 'like', "%{$search}%")
+          ->orWhere('author', 'like', "%{$search}%")
+          ->orWhere('niveau_etude', 'like', "%{$search}%")
+          ->orWhere('module', 'like', "%{$search}%");
+    });
+}
 }
