@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Le Grenier du Geek - Bibliothèque Numérique</title>
+<script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -344,5 +345,16 @@
 
         @yield('content')
     </main>
+    <footer class="bg-gray-900 text-gray-300 text-center py-4 mt-auto">
+    <div class="container mx-auto">
+        <p class="text-sm">
+            © {{ date('Y') }} Le Grenier du Geek — Tous droits réservés.
+        </p>
+        <p class="text-xs mt-1 text-gray-500">
+            Développé avec ❤️ par la communauté.
+        </p>
+    </div>
+</footer>
+
 </body>
 </html>
