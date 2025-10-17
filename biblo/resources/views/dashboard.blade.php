@@ -1,17 +1,13 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+@section('content')
+<div class="py-12 text-center">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Le Grenier du Geek</h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+        Découvrez des ressources numériques dédiées aux étudiants en informatique : cours, tutoriels, documents par domaine. Partagez et apprenez ensemble dans une communauté sécurisée.
+    </p>
+    <a href="/explore" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-semibold shadow-lg transition-all duration-300 inline-block">
+        🔍 Explorer les Ressources
+    </a>
+</div>
+@endsection

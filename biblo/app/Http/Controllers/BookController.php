@@ -88,4 +88,18 @@ class BookController extends Controller
 
         return redirect()->route('books.index')->with('success', 'Document soumis !');
     }
+ public function explore(Request $request)
+{
+    $category = $request->cat ?? '';
+    $query = Book::query();
+    if ($category) {
+        $query->where(function ($q) use ($category) {
+            $q->where('module', 'like', "%{$category}%")
+              ->orWhere('title', 'like', "%{$category}%")
+              ->orWhere('description', 'like', "%{$category}%");
+        });
+    }
+    $books = $query->paginate(9);
+    return view('explore', compact('books', 'category'));
+}
 }
