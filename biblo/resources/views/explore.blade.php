@@ -3,6 +3,8 @@
 @section('content')
 <!-- IMPORTANT: Ce template utilise Tailwind CSS (v3+) et un petit script vanilla pour l'accessibilité.
      Optionnel: tu peux remplacer les icônes SVG par heroicons ou lucide si tu veux.
+     Ajout: Groupement par catégorie avec IDs pour classification (e.g., id="category-ia"). Styles différents par catégorie (couleurs Tailwind).
+     Groupement manuel via PHP in Blade (assume $books trié par module ; pour perf, groupe en contrôleur).
 -->
 
 <div class="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
@@ -47,52 +49,77 @@
       </div>
     </div>
 
-    <!-- Grid des cartes -->
-    <main class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @forelse($books as $book)
-        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-5 flex flex-col">
-          <div class="flex items-start gap-4">
-            <!-- Miniature / placeholder -- replace with real cover if available -->
-            <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-md overflow-hidden flex items-center justify-center">
-              <span class="text-xs font-semibold text-indigo-700">{{ strtoupper(substr($book->module ?? 'DOC', 0, 3)) }}</span>
-            </div>
+    <!-- Groupement par Catégorie (IDs pour classification, styles différents par cat) -->
+    @php
+        // Groupement manuel par module (catégorie)
+        $groupedBooks = $books->groupBy('module');
+        $categories = [
+            'ia' => ['name' => 'IA & Machine Learning', 'color' => 'indigo'],
+            'web' => ['name' => 'Développement Web', 'color' => 'purple'],
+            'bd' => ['name' => 'Bases de Données', 'color' => 'green'],
+            'securite' => ['name' => 'Sécurité Informatique', 'color' => 'red'],
+            'prog' => ['name' => 'Programmation', 'color' => 'yellow'],
+        ];
+    @endphp
 
-            <div class="flex-1">
-              <h3 class="text-lg font-semibold text-slate-900">{{ $book->title }}</h3>
-              <p class="mt-1 text-sm text-slate-500">Par <span class="font-medium text-slate-700">{{ $book->author }}</span> · {{ $book->niveau_etude }} · <span class="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100">{{ $book->module }}</span></p>
+    @foreach($categories as $slug => $cat)
+        <section id="category-{{ $slug }}" class="mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-{{ $cat['color'] }}-100 text-{{ $cat['color'] }}-800 font-semibold text-sm">
+                    {{ $cat['name'] }}
+                </span>
+                <span class="text-sm text-slate-500">({{ $groupedBooks->get($slug, collect())->count() }} docs)</span>
+            </h2>
 
-              <p class="mt-3 text-slate-700 text-sm leading-relaxed">{{ Str::limit($book->description, 140) }}</p>
+            @if($groupedBooks->get($slug, collect())->count() > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($groupedBooks->get($slug) as $book)
+                        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-5 flex flex-col border border-{{ $cat['color'] }}-100">
+                            <div class="flex items-start gap-4">
+                                <!-- Miniature avec style cat -->
+                                <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-{{ $cat['color'] }}-50 to-{{ $cat['color'] }}-100 rounded-md overflow-hidden flex items-center justify-center">
+                                    <span class="text-xs font-semibold text-{{ $cat['color'] }}-700">{{ strtoupper(substr($book->title, 0, 3)) }}</span>
+                                </div>
 
-              <div class="mt-4 flex items-center gap-2">
-                <a href="{{ route('books.show', $book) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-transparent bg-indigo-600 text-white hover:bg-indigo-700">Voir</a>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-slate-900">{{ $book->title }}</h3>
+                                    <p class="mt-1 text-sm text-slate-500">Par <span class="font-medium text-slate-700">{{ $book->author }}</span> · {{ $book->niveau_etude }}</p>
 
-                @auth
-                  <a href="{{ Storage::url($book->file_path) }}" download class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50">Télécharger</a>
-                @else
-                  <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-slate-50">Créer un compte</a>
-                @endauth
+                                    <p class="mt-3 text-slate-700 text-sm leading-relaxed">{{ Str::limit($book->description, 140) }}</p>
 
-                @if($book->tutoriel)
-                  <span class="ml-auto text-xs inline-flex items-center gap-2 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">📘 Tutoriel</span>
-                @endif
-              </div>
-            </div>
-          </div>
-        </article>
-      @empty
-        <div class="col-span-full bg-white rounded-lg p-8 text-center shadow">
-          <h3 class="text-2xl font-semibold">Aucun document</h3>
-          <p class="mt-2 text-slate-600">Soyez le premier à contribuer.</p>
-          @auth
-            <a href="/books/create" class="mt-4 inline-block px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">+ Ajouter un document</a>
-          @else
-            <a href="{{ route('register') }}" class="mt-4 inline-block px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Créer un compte</a>
-          @endauth
-        </div>
-      @endforelse
-    </main>
+                                    <div class="mt-4 flex items-center gap-2">
+                                        <a href="{{ route('books.show', $book) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-transparent bg-{{ $cat['color'] }}-600 text-white hover:bg-{{ $cat['color'] }}-700">Voir</a>
 
-    <!-- Pagination -->
+                                        @auth
+                                            <a href="{{ Storage::url($book->file_path) }}" download class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-{{ $cat['color'] }}-200 bg-white text-{{ $cat['color'] }}-700 hover:bg-{{ $cat['color'] }}-50">Télécharger</a>
+                                        @else
+                                            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-slate-50">Créer un compte</a>
+                                        @endauth
+
+                                        @if($book->tutoriel)
+                                            <span class="ml-auto text-xs inline-flex items-center gap-2 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">📘 Tutoriel</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="bg-{{ $cat['color'] }}-50 border border-{{ $cat['color'] }}-200 rounded-xl p-8 text-center">
+                    <h3 class="text-xl font-semibold text-{{ $cat['color'] }}-800 mb-2">Aucun document dans {{ $cat['name'] }}</h3>
+                    <p class="text-{{ $cat['color'] }}-600 mb-4">Soyez le premier à contribuer à cette catégorie !</p>
+                    @auth
+                        <a href="/books/create?module={{ $slug }}" class="inline-flex items-center gap-2 px-4 py-2 bg-{{ $cat['color'] }}-600 text-white rounded-lg font-medium hover:bg-{{ $cat['color'] }}-700">+ Ajouter un Document</a>
+                    @else
+                        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg font-medium hover:bg-slate-700">Créer un Compte</a>
+                    @endauth
+                </div>
+            @endif
+        </section>
+    @endforeach
+
+    <!-- Pagination globale -->
     <div class="mt-8 flex items-center justify-center">
       {{ $books->appends(request()->query())->links() }}
     </div>

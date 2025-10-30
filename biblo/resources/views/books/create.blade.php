@@ -40,14 +40,13 @@
         </div>
     </div>
 
-    <!-- Champs Document (même que guest, sans user) -->
+    <!-- Champs Document -->
     <h2 class="text-lg font-semibold mb-2">Infos du Document</h2>
     <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Titre <span class="text-red-500">*</span></label>
         <input type="text" name="title" required class="block w-full border p-2 rounded" value="{{ old('title') }}">
         <x-input-error :messages="$errors->get('title')" class="mt-1" />
     </div>
-    <!-- ... Ajoute author, description, module, tutoriel, file comme dans create-guest ... -->
     <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Auteur <span class="text-red-500">*</span></label>
         <input type="text" name="author" required class="block w-full border p-2 rounded" value="{{ old('author') }}">
@@ -59,8 +58,15 @@
         <x-input-error :messages="$errors->get('description')" class="mt-1" />
     </div>
     <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Module (pour recherche)</label>
-        <input type="text" name="module" class="block w-full border p-2 rounded" value="{{ old('module') }}">
+        <label class="block text-sm font-medium mb-1">Module (pour recherche) <span class="text-red-500">*</span></label>
+        <select name="module" required class="block w-full border p-2 rounded">
+            <option value="">Sélectionnez un domaine</option>
+            <option value="ia" {{ old('module') == 'ia' ? 'selected' : '' }}>IA & Machine Learning (Algorithmes, Deep Learning, NLP)</option>
+            <option value="web" {{ old('module') == 'web' ? 'selected' : '' }}>Développement Web (HTML, JS, Frameworks)</option>
+            <option value="bd" {{ old('module') == 'bd' ? 'selected' : '' }}>Bases de Données (SQL, NoSQL, Modélisation)</option>
+            <option value="securite" {{ old('module') == 'securite' ? 'selected' : '' }}>Sécurité Informatique (Cryptographie, Réseau, Audit)</option>
+            <option value="prog" {{ old('module') == 'prog' ? 'selected' : '' }}>Programmation (Python, Java, Rust)</option>
+        </select>
         <x-input-error :messages="$errors->get('module')" class="mt-1" />
     </div>
     <div class="mb-4">

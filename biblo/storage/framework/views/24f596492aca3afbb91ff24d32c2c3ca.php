@@ -1,7 +1,7 @@
 <?php $__env->startSection('content'); ?>
 <!-- Conteneur plein écran sans marge -->
 <div class="relative min-h-screen w-full bg-cover bg-center bg-fixed"
-     style="background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1920&q=80'); margin: 0; padding: 0;">
+     style="background-image: url('https://th.bing.com/th/id/R.3dc220e921cbdf66dc22295c6d9a1f5b?rik=F6bneYjessyCXA&riu=http%3a%2f%2fwww.pearltrees.com%2fs%2fbackground%2fimage%2fc8%2f0b%2fc80b7d56ffc7dae0df5de301cfd83518.jpg&ehk=DsrS9XV0eTCQlmhCnTKd6vzUcFMFqVaSwG3iN3EA8xU%3d&risl=&pid=ImgRaw&r=0'); margin: 0; padding: 0;">
 
     <!-- Superposition sombre pour contraste -->
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>

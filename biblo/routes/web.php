@@ -2,21 +2,20 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\Forum\CategoryController;
-use App\Http\Controllers\Forum\ThreadController;
-use App\Http\Controllers\Forum\PostController;
+use App\Http\Controllers\ForumController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Routes Web
 |--------------------------------------------------------------------------
-|
-| Routes principales de l'application "Le Grenier du Geek"
-| - Espace livres / ressources
+| Application "Le Grenier du Geek"
+| - Gestion des livres / ressources
 | - Forum communautaire
-| - Gestion du profil utilisateur
-|
+| - Chatbot intelligent
+| - Gestion des profils utilisateurs
+|--------------------------------------------------------------------------
 */
 
 // 🏠 Accueil → redirection vers la section livres
@@ -43,22 +42,31 @@ Route::controller(BookController::class)->group(function () {
     Route::get('/explore', 'explore')->name('explore');
 });
 
-// 💬 Forum communautaire
+// 💬 Forum communautaire (prefix forum, auth pour actions)
 Route::prefix('forum')->name('forum.')->group(function () {
+    // Accès libre pour voir
+    Route::get('/', [ForumController::class, 'index'])->name('index');
+    Route::get('/category/{category}', [ForumController::class, 'showCategory'])->name('category.show');
+    Route::get('/thread/{thread}', [ForumController::class, 'showThread'])->name('thread.show');
 
-    // 📁 Catégories
-    Route::get('/', [CategoryController::class, 'index'])->name('index');
-    Route::get('/{category:slug}', [CategoryController::class, 'show'])->name('category.show');
-
-    // 🧵 Discussions (threads)
+    // Auth required pour créer/reply
     Route::middleware('auth')->group(function () {
-        Route::get('/threads/nouveau', [ThreadController::class, 'create'])->name('threads.create');
-        Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
-        Route::post('/thread/{thread:slug}/reply', [PostController::class, 'store'])->name('posts.store');
+        Route::get('/thread/create', [ForumController::class, 'createThread'])->name('thread.create');
+        Route::post('/thread', [ForumController::class, 'storeThread'])->name('thread.store');
+        Route::post('/thread/{thread}/reply', [ForumController::class, 'storePost'])->name('thread.reply');
     });
 
-    Route::get('/thread/{thread:slug}', [ThreadController::class, 'show'])->name('threads.show');
+    // Admin only pour gestion catégories
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/categories/create', [ForumController::class, 'createCategory'])->name('categories.create');
+        Route::post('/categories', [ForumController::class, 'storeCategory'])->name('categories.store');
+    });
 });
 
-// 🔐 Authentification (Laravel Breeze / Jetstream)
-require __DIR__.'/auth.php';
+// 🤖 Chatbot
+// 🤖 Chatbot
+Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index'); // Page chat
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask'); // Réponse bot
+
+// 🔐 Authentification
+require __DIR__ . '/auth.php';

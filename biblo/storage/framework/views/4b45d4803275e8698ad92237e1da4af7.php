@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <!-- Champs Document (même que guest, sans user) -->
+    <!-- Champs Document -->
     <h2 class="text-lg font-semibold mb-2">Infos du Document</h2>
     <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Titre <span class="text-red-500">*</span></label>
@@ -85,7 +85,6 @@
 <?php unset($__componentOriginalf94ed9c5393ef72725d159fe01139746); ?>
 <?php endif; ?>
     </div>
-    <!-- ... Ajoute author, description, module, tutoriel, file comme dans create-guest ... -->
     <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Auteur <span class="text-red-500">*</span></label>
         <input type="text" name="author" required class="block w-full border p-2 rounded" value="<?php echo e(old('author')); ?>">
@@ -135,8 +134,15 @@
 <?php endif; ?>
     </div>
     <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Module (pour recherche)</label>
-        <input type="text" name="module" class="block w-full border p-2 rounded" value="<?php echo e(old('module')); ?>">
+        <label class="block text-sm font-medium mb-1">Module (pour recherche) <span class="text-red-500">*</span></label>
+        <select name="module" required class="block w-full border p-2 rounded">
+            <option value="">Sélectionnez un domaine</option>
+            <option value="ia" <?php echo e(old('module') == 'ia' ? 'selected' : ''); ?>>IA & Machine Learning (Algorithmes, Deep Learning, NLP)</option>
+            <option value="web" <?php echo e(old('module') == 'web' ? 'selected' : ''); ?>>Développement Web (HTML, JS, Frameworks)</option>
+            <option value="bd" <?php echo e(old('module') == 'bd' ? 'selected' : ''); ?>>Bases de Données (SQL, NoSQL, Modélisation)</option>
+            <option value="securite" <?php echo e(old('module') == 'securite' ? 'selected' : ''); ?>>Sécurité Informatique (Cryptographie, Réseau, Audit)</option>
+            <option value="prog" <?php echo e(old('module') == 'prog' ? 'selected' : ''); ?>>Programmation (Python, Java, Rust)</option>
+        </select>
         <?php if (isset($component)) { $__componentOriginalf94ed9c5393ef72725d159fe01139746 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf94ed9c5393ef72725d159fe01139746 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.input-error','data' => ['messages' => $errors->get('module'),'class' => 'mt-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

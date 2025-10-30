@@ -3,6 +3,8 @@
 <?php $__env->startSection('content'); ?>
 <!-- IMPORTANT: Ce template utilise Tailwind CSS (v3+) et un petit script vanilla pour l'accessibilité.
      Optionnel: tu peux remplacer les icônes SVG par heroicons ou lucide si tu veux.
+     Ajout: Groupement par catégorie avec IDs pour classification (e.g., id="category-ia"). Styles différents par catégorie (couleurs Tailwind).
+     Groupement manuel via PHP in Blade (assume $books trié par module ; pour perf, groupe en contrôleur).
 -->
 
 <div class="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
@@ -47,52 +49,78 @@
       </div>
     </div>
 
-    <!-- Grid des cartes -->
-    <main class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <?php $__empty_1 = true; $__currentLoopData = $books; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-5 flex flex-col">
-          <div class="flex items-start gap-4">
-            <!-- Miniature / placeholder -- replace with real cover if available -->
-            <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-md overflow-hidden flex items-center justify-center">
-              <span class="text-xs font-semibold text-indigo-700"><?php echo e(strtoupper(substr($book->module ?? 'DOC', 0, 3))); ?></span>
-            </div>
+    <!-- Groupement par Catégorie (IDs pour classification, styles différents par cat) -->
+    <?php
+        // Groupement manuel par module (catégorie)
+        $groupedBooks = $books->groupBy('module');
+        $categories = [
+            'ia' => ['name' => 'IA & Machine Learning', 'color' => 'indigo'],
+            'web' => ['name' => 'Développement Web', 'color' => 'purple'],
+            'bd' => ['name' => 'Bases de Données', 'color' => 'green'],
+            'securite' => ['name' => 'Sécurité Informatique', 'color' => 'red'],
+            'prog' => ['name' => 'Programmation', 'color' => 'yellow'],
+        ];
+    ?>
 
-            <div class="flex-1">
-              <h3 class="text-lg font-semibold text-slate-900"><?php echo e($book->title); ?></h3>
-              <p class="mt-1 text-sm text-slate-500">Par <span class="font-medium text-slate-700"><?php echo e($book->author); ?></span> · <?php echo e($book->niveau_etude); ?> · <span class="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100"><?php echo e($book->module); ?></span></p>
+    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slug => $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <section id="category-<?php echo e($slug); ?>" class="mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-<?php echo e($cat['color']); ?>-100 text-<?php echo e($cat['color']); ?>-800 font-semibold text-sm">
+                    <?php echo e($cat['name']); ?>
 
-              <p class="mt-3 text-slate-700 text-sm leading-relaxed"><?php echo e(Str::limit($book->description, 140)); ?></p>
+                </span>
+                <span class="text-sm text-slate-500">(<?php echo e($groupedBooks->get($slug, collect())->count()); ?> docs)</span>
+            </h2>
 
-              <div class="mt-4 flex items-center gap-2">
-                <a href="<?php echo e(route('books.show', $book)); ?>" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-transparent bg-indigo-600 text-white hover:bg-indigo-700">Voir</a>
+            <?php if($groupedBooks->get($slug, collect())->count() > 0): ?>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <?php $__currentLoopData = $groupedBooks->get($slug); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <article class="bg-white rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-1 transition p-5 flex flex-col border border-<?php echo e($cat['color']); ?>-100">
+                            <div class="flex items-start gap-4">
+                                <!-- Miniature avec style cat -->
+                                <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-<?php echo e($cat['color']); ?>-50 to-<?php echo e($cat['color']); ?>-100 rounded-md overflow-hidden flex items-center justify-center">
+                                    <span class="text-xs font-semibold text-<?php echo e($cat['color']); ?>-700"><?php echo e(strtoupper(substr($book->title, 0, 3))); ?></span>
+                                </div>
 
-                <?php if(auth()->guard()->check()): ?>
-                  <a href="<?php echo e(Storage::url($book->file_path)); ?>" download class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50">Télécharger</a>
-                <?php else: ?>
-                  <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-slate-50">Créer un compte</a>
-                <?php endif; ?>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-slate-900"><?php echo e($book->title); ?></h3>
+                                    <p class="mt-1 text-sm text-slate-500">Par <span class="font-medium text-slate-700"><?php echo e($book->author); ?></span> · <?php echo e($book->niveau_etude); ?></p>
 
-                <?php if($book->tutoriel): ?>
-                  <span class="ml-auto text-xs inline-flex items-center gap-2 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">📘 Tutoriel</span>
-                <?php endif; ?>
-              </div>
-            </div>
-          </div>
-        </article>
-      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-        <div class="col-span-full bg-white rounded-lg p-8 text-center shadow">
-          <h3 class="text-2xl font-semibold">Aucun document</h3>
-          <p class="mt-2 text-slate-600">Soyez le premier à contribuer.</p>
-          <?php if(auth()->guard()->check()): ?>
-            <a href="/books/create" class="mt-4 inline-block px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">+ Ajouter un document</a>
-          <?php else: ?>
-            <a href="<?php echo e(route('register')); ?>" class="mt-4 inline-block px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Créer un compte</a>
-          <?php endif; ?>
-        </div>
-      <?php endif; ?>
-    </main>
+                                    <p class="mt-3 text-slate-700 text-sm leading-relaxed"><?php echo e(Str::limit($book->description, 140)); ?></p>
 
-    <!-- Pagination -->
+                                    <div class="mt-4 flex items-center gap-2">
+                                        <a href="<?php echo e(route('books.show', $book)); ?>" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-transparent bg-<?php echo e($cat['color']); ?>-600 text-white hover:bg-<?php echo e($cat['color']); ?>-700">Voir</a>
+
+                                        <?php if(auth()->guard()->check()): ?>
+                                            <a href="<?php echo e(Storage::url($book->file_path)); ?>" download class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-<?php echo e($cat['color']); ?>-200 bg-white text-<?php echo e($cat['color']); ?>-700 hover:bg-<?php echo e($cat['color']); ?>-50">Télécharger</a>
+                                        <?php else: ?>
+                                            <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-slate-50">Créer un compte</a>
+                                        <?php endif; ?>
+
+                                        <?php if($book->tutoriel): ?>
+                                            <span class="ml-auto text-xs inline-flex items-center gap-2 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">📘 Tutoriel</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            <?php else: ?>
+                <div class="bg-<?php echo e($cat['color']); ?>-50 border border-<?php echo e($cat['color']); ?>-200 rounded-xl p-8 text-center">
+                    <h3 class="text-xl font-semibold text-<?php echo e($cat['color']); ?>-800 mb-2">Aucun document dans <?php echo e($cat['name']); ?></h3>
+                    <p class="text-<?php echo e($cat['color']); ?>-600 mb-4">Soyez le premier à contribuer à cette catégorie !</p>
+                    <?php if(auth()->guard()->check()): ?>
+                        <a href="/books/create?module=<?php echo e($slug); ?>" class="inline-flex items-center gap-2 px-4 py-2 bg-<?php echo e($cat['color']); ?>-600 text-white rounded-lg font-medium hover:bg-<?php echo e($cat['color']); ?>-700">+ Ajouter un Document</a>
+                    <?php else: ?>
+                        <a href="<?php echo e(route('register')); ?>" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg font-medium hover:bg-slate-700">Créer un Compte</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+    <!-- Pagination globale -->
     <div class="mt-8 flex items-center justify-center">
       <?php echo e($books->appends(request()->query())->links()); ?>
 
@@ -170,5 +198,4 @@ document.addEventListener('keydown', function(e){
 </script>
 
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\pc\Desktop\2G\le-grenier_du_geek\biblo\resources\views/explore.blade.php ENDPATH**/ ?>

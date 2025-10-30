@@ -1,4 +1,11 @@
 <?php return array (
+  'kalnoy/nestedset' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Kalnoy\\Nestedset\\NestedSetServiceProvider',
+    ),
+  ),
   'laravel/breeze' => 
   array (
     'providers' => 
@@ -46,6 +53,13 @@
     'providers' => 
     array (
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    ),
+  ),
+  'riari/laravel-forum' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'TeamTeaTime\\Forum\\ForumServiceProvider',
     ),
   ),
   'spatie/laravel-permission' => 
