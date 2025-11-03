@@ -27,12 +27,27 @@
                 <h3 class="text-xl font-semibold mb-2">{{ $category->title }}</h3>
                 <p class="text-gray-600 mb-4">{{ Str::limit($category->description, 100) }}</p>
                 <p class="text-sm text-gray-500 mb-4">{{ $category->threads_count }} discussions · {{ $category->posts_count }} posts</p>
+
                 @auth
-                    <a href="{{ route('forum.thread.create', $category->id) }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm font-medium">Démarrer Discussion</a>
+                    <a href="{{ route('forum.thread.create', [
+                        'category_id'   => $category->id,
+                        'category_slug' => $category->slug ?? \Illuminate\Support\Str::slug($category->title)
+                    ]) }}" 
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm font-medium">
+                        Démarrer Discussion
+                    </a>
                 @else
-                    <a href="{{ route('login') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm font-medium">Se Connecter pour Poster</a>
+                    <a href="{{ route('login') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm font-medium">
+                        Se Connecter pour Poster
+                    </a>
                 @endauth
-                <a href="{{ route('forum.category.show', $category) }}" class="block mt-3 text-blue-600 hover:underline text-sm">Voir les Discussions</a>
+
+                <a href="{{ route('forum.category.show', [
+                    'category_id'   => $category->id,
+                    'category_slug' => $category->slug ?? \Illuminate\Support\Str::slug($category->title)
+                ]) }}" class="block mt-3 text-blue-600 hover:underline text-sm">
+                    Voir les Discussions
+                </a>
             </div>
         @endforeach
     </div>
@@ -41,7 +56,9 @@
         <div class="text-center py-12">
             <p class="text-gray-500 text-lg">Aucune catégorie disponible pour le moment.</p>
             @auth
-                <a href="/admin/categories/create" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Créer la Première</a>
+                <a href="/admin/categories/create" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Créer la Première
+                </a>
             @endauth
         </div>
     @endif

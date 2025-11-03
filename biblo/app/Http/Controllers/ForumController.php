@@ -21,13 +21,21 @@ class ForumController extends BaseController
      * Affiche la liste des catégories du forum.
      */
     public function index()
-    {
-        $categories = Category::withCount(['threads as threads_count', 'posts as posts_count'])
-                              ->orderBy('title')
-                              ->get();
+{
+    $categories = Category::withCount('threads')
+                    ->with(['threads' => function ($query) {
+                        $query->withCount('posts');
+                    }])
+                    ->orderBy('title')
+                    ->get();
 
-        return view('forum.index', compact('categories'));
+    foreach ($categories as $category) {
+        $category->posts_count = $category->threads->sum('posts_count');
     }
+
+    return view('forum.index', compact('categories'));
+}
+
 
     /**
      * Affiche les discussions d'une catégorie.

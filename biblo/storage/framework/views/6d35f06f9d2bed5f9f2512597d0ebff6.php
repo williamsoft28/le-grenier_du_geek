@@ -27,12 +27,27 @@
                 <h3 class="text-xl font-semibold mb-2"><?php echo e($category->title); ?></h3>
                 <p class="text-gray-600 mb-4"><?php echo e(Str::limit($category->description, 100)); ?></p>
                 <p class="text-sm text-gray-500 mb-4"><?php echo e($category->threads_count); ?> discussions · <?php echo e($category->posts_count); ?> posts</p>
+
                 <?php if(auth()->guard()->check()): ?>
-                    <a href="<?php echo e(route('forum.thread.create', $category->id)); ?>" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm font-medium">Démarrer Discussion</a>
+                    <a href="<?php echo e(route('forum.thread.create', [
+                        'category_id'   => $category->id,
+                        'category_slug' => $category->slug ?? \Illuminate\Support\Str::slug($category->title)
+                    ])); ?>" 
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm font-medium">
+                        Démarrer Discussion
+                    </a>
                 <?php else: ?>
-                    <a href="<?php echo e(route('login')); ?>" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm font-medium">Se Connecter pour Poster</a>
+                    <a href="<?php echo e(route('login')); ?>" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm font-medium">
+                        Se Connecter pour Poster
+                    </a>
                 <?php endif; ?>
-                <a href="<?php echo e(route('forum.category.show', $category)); ?>" class="block mt-3 text-blue-600 hover:underline text-sm">Voir les Discussions</a>
+
+                <a href="<?php echo e(route('forum.category.show', [
+                    'category_id'   => $category->id,
+                    'category_slug' => $category->slug ?? \Illuminate\Support\Str::slug($category->title)
+                ])); ?>" class="block mt-3 text-blue-600 hover:underline text-sm">
+                    Voir les Discussions
+                </a>
             </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
@@ -41,10 +56,13 @@
         <div class="text-center py-12">
             <p class="text-gray-500 text-lg">Aucune catégorie disponible pour le moment.</p>
             <?php if(auth()->guard()->check()): ?>
-                <a href="/admin/categories/create" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Créer la Première</a>
+                <a href="/admin/categories/create" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Créer la Première
+                </a>
             <?php endif; ?>
         </div>
     <?php endif; ?>
 </div>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\pc\Desktop\2G\le-grenier_du_geek\biblo\resources\views/forum/index.blade.php ENDPATH**/ ?>
