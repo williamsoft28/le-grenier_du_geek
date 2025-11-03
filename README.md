@@ -9,6 +9,7 @@ Un espace de partage de ressources et de livres techniques
 Un forum de discussion collaboratif(inovation)
 
 Un chatbot intelligent pour assister les utilisateurs(inovation)
+
 on a egalement une section bon plan qui donne tout ce qui est  nouveaute
 Ce projet est développé avec Laravel 12, TailwindCSS, et une architecture modulaire orientée vers la communauté.
 
